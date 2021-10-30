@@ -2,6 +2,7 @@ import numpy as np
 from itertools import zip_longest
 MEPS = 1.0e-10
 
+
 def simplex(c, A, b):
     """
     This function solve a linear programming using Simplex method.
@@ -51,6 +52,7 @@ def simplex(c, A, b):
         ratio[d > MEPS] = [bb_i / d_i for (bb_i, d_i) in zip(bb, d) if d_i > MEPS]
         leaving_id = np.argmin(ratio)
         nonbasis[entering_id], basis[leaving_id] = basis[leaving_id], nonbasis[entering_id]
+
 
 if __name__ == "__main__":
     A = np.array([[2, 2, -1], [2, -2, 3], [0, 2, -1]])
