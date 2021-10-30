@@ -1,6 +1,7 @@
 import numpy as np
 from copy import deepcopy
 
+
 class PrimalInteriorPoint(object):
     def __init__(self, c, A, b, init, gamma=0.5, beta=0.5, mu0=1, eps=1e-6):
         # data
@@ -32,6 +33,7 @@ class PrimalInteriorPoint(object):
     def solve(self, max_iter=100):
         raise NotImplementedError
 
+
 class PrimalPathFollowing(PrimalInteriorPoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,6 +60,7 @@ class PrimalPathFollowing(PrimalInteriorPoint):
                 print("Optimal value is not found")
                 break
 
+
 class PrimalAffineScaling(PrimalInteriorPoint):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,6 +84,7 @@ class PrimalAffineScaling(PrimalInteriorPoint):
             if self.count >= max_iter:
                 print("Optimal value is not found")
                 break
+
 
 if __name__ == "__main__":
     c = np.array([-1, -1, 0, 0])

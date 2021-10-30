@@ -1,8 +1,9 @@
 import numpy as np
 from copy import deepcopy
-from linear_programming.utils import binary_search_step_size
+from utils import binary_search_step_size
 
-class PrimalDualInteriorPoint(object):
+
+class PrimalDualInteriorPoint:
     """
     Primal-Dual Interior Point method solve both primal and dual linear problems such that
         Primal: minimize c^Tx
@@ -74,6 +75,7 @@ class PrimalDualInteriorPoint(object):
         optimal values of x, y, and z
         """
         raise NotImplementedError
+
 
 class PrimalDualAffineScaling(PrimalDualInteriorPoint):
     """
@@ -203,7 +205,6 @@ if __name__ == "__main__":
     print(np.round(z, 3))
     print("Ax = b:", np.all(np.abs(b - np.dot(A, x)) <= 1e-5))
     print("A^Ty + z = c:", np.all(np.abs(c - np.dot(A.T, y) - z) <= 1e-5))
-
 
     print("Path-Following")
     path_following = PrimalDualPathFollowing(c=c, A=A, b=b, init=init)

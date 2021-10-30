@@ -1,5 +1,6 @@
 import numpy as np
-from linear_programming.utils import binary_search_step_size
+from utils import binary_search_step_size
+
 
 class SelfDualPrimalDualPathFollowing:
     def __init__(self, c, A, b, eps=1e-6):
