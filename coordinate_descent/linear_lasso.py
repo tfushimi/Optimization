@@ -68,7 +68,6 @@ if __name__ == '__main__':
     y = crime_data.iloc[:, 0].to_numpy().astype(float)
     p = x.shape[1]
 
-    # Coordinate Descent
     gammas = np.arange(0, 200, 0.01)
     beta_list = np.zeros((len(gammas), p))
     for i, gamma in enumerate(gammas):
