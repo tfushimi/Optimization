@@ -13,7 +13,7 @@ def proximal_gradient_descent(x: np.ndarray,
                               group: np.ndarray,
                               gamma: float) -> RegressionResult:
     """
-    Estimate Lasso model via Proximal Gradient Descent
+    Estimate Group Lasso model via Proximal Gradient Descent
 
     Args:
          x: 2-d numpy array of predictors
