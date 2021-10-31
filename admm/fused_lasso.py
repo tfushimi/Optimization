@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print(f'gamma={gamma}')
         beta_list[i, :] = admm(y, gamma, rho=1.0)
 
-    plt.scatter(range(N), y, s=1, color='black')
+    plt.scatter(range(N), y, s=1, color='grey')
     colors = ['red', 'green', 'blue']
     for i, (gamma, color) in enumerate(zip(gammas, colors)):
         plt.plot(range(N), beta_list[i, :], label=f"gamma={gamma}", color=color)
