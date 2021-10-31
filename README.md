@@ -15,4 +15,5 @@
 
 ## Proximal Gradient Descent
 - Linear Lasso Regression
+- Group Lasso  
 - Matrix Completion with Soft-Thresholding
