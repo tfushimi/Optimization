@@ -12,7 +12,7 @@ def proximal_gradient_descent(x: np.ndarray,
                               y: np.ndarray,
                               gamma: float) -> RegressionResult:
     """
-    Estimate Lasso model via ADMM
+    Estimate Lasso model via Proximal Gradient Descent
 
     Args:
          x: 2-d numpy array of predictors
@@ -43,7 +43,7 @@ def proximal_gradient_descent(x: np.ndarray,
     xTy = np.dot(x.T, y)
     xTx = np.dot(x.T, x)
 
-    t = 0.01
+    t = 0.01  # TODO use backtracking
     for _ in range(MAX_COUNT):
         beta = soft_threshold(beta + t * (xTy - np.dot(xTx, beta)), gamma * t)
 
