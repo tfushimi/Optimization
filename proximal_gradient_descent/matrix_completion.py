@@ -1,35 +1,107 @@
 import numpy as np
 from PIL import Image
-from matplotlib.pyplot import imshow
+
+MAX_ITER = 1000
 
 
-def soft_svd(lambd, z):
-    u, s, vh = np.linalg.svd(z)
-    sigma = np.zeros((z.shape[0], z.shape[1]))
+def soft_thresholding_svd(x: np.ndarray,
+                          gamma: float):
+    """
+    Calculate Soft SVD
+
+    Args:
+        x: 2-d array
+        gamma: regularization parameter
+
+    Returns:
+
+    """
+    u, s, v = np.linalg.svd(x)
+    m, n = x.shape
+    sigma = np.zeros((m, n))
     for i in range(len(s)):
-        sigma[i, i] = np.max(s[i] - lambd, 0)
-    return np.dot(np.dot(u, sigma), vh)
+        sigma[i, i] = np.max(s[i] - gamma, 0)
+    return np.dot(np.dot(u, sigma), v)
 
 
-def mat_lasso(lambd, z, mask):
-    m = z.shape[0]
-    n = z.shape[1]
-    guess = np.random.normal(size=m*n).reshape(m, -1)
-    for i in range(20):
-        guess = soft_svd(lambd, mask * z + (1 - mask) * guess)
-    return guess
+def soft_impute(x: np.ndarray,
+                mask: np.ndarray,
+                *,
+                gamma: float,
+                rel_tol: float = 1e-4,
+                verbose: bool = False):
+    """
+    Soft-Impute Algorithm
+
+    Args:
+        x: 2-d array with missing elements
+        mask: 2-d array indicating observed elements
+        gamma: regularization parameter
+        rel_tol: relative tolerance
+        verbose: print progress if True
+
+    Returns:
+        soft inputed 2-d array
+    """
+    sol = x.copy()
+    sol_prev = sol.copy()
+    mask = mask.astype('uint8')
+    for i in range(MAX_ITER):
+        sol = soft_thresholding_svd(mask * x + (1 - mask) * sol, gamma)
+
+        abs_eps = np.linalg.norm(sol)
+        rel_eps = np.linalg.norm(sol - sol_prev) / abs_eps
+
+        if verbose and (i % 50 == 0):
+            print(f'iteration={i}, rel_eps={rel_eps}, abs_eps={abs_eps}, tol={rel_tol}')
+
+        if rel_eps < rel_tol:
+            break
+        sol_prev = sol.copy()
+    return sol
+
+
+def multi_dim_soft_impute(x: np.ndarray,
+                          *,
+                          gamma: float,
+                          verbose: bool = False):
+    """
+    Run Soft-Impute Algorithm for 2-d array in each dimension
+
+    Args:
+        x: 3-d array
+        gamma: regularization
+        verbose: print progress if True
+
+    Returns:
+        Soft imputed 3-d array
+    """
+    assert x.ndim == 3
+    _, _, d = x.shape
+    imputed_data = np.zeros_like(x)
+    for i in range(d):
+        if verbose:
+            print(f'dimension={i}')
+        imputed_data[:, :, i] = soft_impute(x[:, :, i], mask, gamma=gamma, verbose=verbose)
+    return imputed_data
 
 
 if __name__ == '__main__':
-    image = np.array(Image.open("../output/lion.jpg"))
-    m = image[:, :, 1].shape[0]
-    n = image[:, :, 1].shape[1]
-    p = 0.5
-    lambd = 1.0
-    mat = np.zeros((m, n, 3))
-    mask = np.random.binomial(1, p, size=m*n).reshape(-1, n)
-    for i in range(3):
-        mat[:, :, i] = mat_lasso(lambd, image[:, :, i], mask)
-    Image.fromarray(np.uint8(mat)).save("../output/lion3_compressed_mat_soft.jpg")
-    i = Image.open("../output/lion3_compressed_mat_soft.jpg")
-    imshow(i)
+    image = Image.open('../data/image.jpg')
+    data = np.asarray(image)
+    nrow, ncol, d = data.shape
+    print(f'nrow={nrow}, ncol={ncol}, d={d}')
+
+    mask = np.random.binomial(1, size=nrow * ncol, p=0.8).reshape((nrow, ncol))
+
+    corrupted_data = np.zeros((nrow, ncol, 3))
+    for i in range(d):
+        corrupted_data[:, :, i] = (mask * data[:, :, i])
+
+    imputed_data = multi_dim_soft_impute(corrupted_data, gamma=10, verbose=True)
+
+    corrupted_image = Image.fromarray(np.uint8(corrupted_data))
+    corrupted_image.save('../output/corrupted_image.jpg')
+
+    imputed_image = Image.fromarray(np.uint8(imputed_data))
+    imputed_image.save('../output/imputed_image.jpg')
