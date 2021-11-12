@@ -7,10 +7,12 @@
 ## Coordinate Descent
 - Linear Lasso Regression
 
-## Linear Programming
+## Interior Point Method
 - Primal Interior Point Method
 - Primal Dual Interior Point Method
 - Self-Dual Interior Point Method
+
+## Simplex Method
 - Simplex Method
 
 ## Proximal Gradient Descent
