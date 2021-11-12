@@ -1,5 +1,5 @@
 import numpy as np
-from utils import soft_threshold
+from utils import prox_group_norm
 from collections import namedtuple
 
 MAX_COUNT = 1000
@@ -48,7 +48,7 @@ def proximal_gradient_descent(x: np.ndarray,
     t = 0.00001  # TODO use backtracking
     for _ in range(MAX_COUNT):
         beta = beta + t * (xTy - np.dot(xTx, beta))
-        beta = prox_operator(beta, group, t * gamma)
+        beta = prox_group_norm(beta, group, t * gamma)
 
         beta_norm = np.linalg.norm(beta_prev - beta, 2)
 
@@ -61,21 +61,6 @@ def proximal_gradient_descent(x: np.ndarray,
     intercept = y_mean - np.dot(x_mean, beta)
 
     return RegressionResult(beta, intercept)
-
-
-def prox_operator(b: np.ndarray,
-                  group: np.ndarray,
-                  threshold: float) -> np.ndarray:
-    result = np.zeros_like(b).astype(np.float64)
-    unique_group_ids = np.unique(group)
-    for group_id in unique_group_ids:
-        target_idx = group == group_id
-        target_coef = b[target_idx]
-        group_norm = np.linalg.norm(target_coef, 2)
-        multiplier = 0 if group_norm == 0 else max(0, 1 - threshold / group_norm)
-        result[target_idx] = multiplier * target_coef
-
-    return result
 
 
 if __name__ == '__main__':

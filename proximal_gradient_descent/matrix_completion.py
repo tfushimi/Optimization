@@ -1,27 +1,8 @@
 import numpy as np
-from PIL import Image
+
+from utils import prox_nuclear_norm
 
 MAX_ITER = 1000
-
-
-def soft_thresholding_svd(x: np.ndarray,
-                          gamma: float):
-    """
-    Calculate Soft SVD
-
-    Args:
-        x: 2-d array
-        gamma: regularization parameter
-
-    Returns:
-
-    """
-    u, s, v = np.linalg.svd(x)
-    m, n = x.shape
-    sigma = np.zeros((m, n))
-    for i in range(len(s)):
-        sigma[i, i] = np.max(s[i] - gamma, 0)
-    return np.dot(np.dot(u, sigma), v)
 
 
 def soft_impute(x: np.ndarray,
@@ -47,7 +28,7 @@ def soft_impute(x: np.ndarray,
     sol_prev = sol.copy()
     mask = mask.astype('uint8')
     for i in range(MAX_ITER):
-        sol = soft_thresholding_svd(mask * x + (1 - mask) * sol, gamma)
+        sol = prox_nuclear_norm(mask * x + (1 - mask) * sol, gamma)
 
         abs_eps = np.linalg.norm(sol)
         rel_eps = np.linalg.norm(sol - sol_prev) / abs_eps
@@ -87,6 +68,8 @@ def multi_dim_soft_impute(x: np.ndarray,
 
 
 if __name__ == '__main__':
+    from PIL import Image
+
     image = Image.open('../data/image.jpg')
     data = np.asarray(image)
     nrow, ncol, d = data.shape

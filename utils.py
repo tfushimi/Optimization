@@ -46,11 +46,66 @@ def binary_search_step_size(x, z, dx, dz, beta=0.5, prec=0.001):
         z_mid = z + theta_mid * dz
         mu_mid = np.dot(x_mid, z_mid) / n
         if np.linalg.norm(x_mid * z_mid - mu_mid * np.ones(n)) <= beta * mu_mid:
-            theta_low = theta_mid # discard the lower half
+            theta_low = theta_mid  # discard the lower half
         else:
-            theta_high = theta_mid # discard the upper half
+            theta_high = theta_mid  # discard the upper half
     return theta_low
 
 
 def soft_threshold(x, gamma):
-    return np.sign(x) * np.maximum(np.abs(x) - gamma, 0.0)
+    return np.sign(x) * np.maximum(np.abs(x) - gamma, 0)
+
+
+def prox_nuclear_norm(x: np.ndarray,
+                      gamma: float):
+    """
+    Calculate Soft SVD
+
+    Args:
+        x: 2-d array
+        gamma: regularization parameter
+
+    Returns:
+
+    """
+    u, s, v = np.linalg.svd(x)
+    m, n = x.shape
+    sigma = np.zeros((m, n))
+    for i in range(len(s)):
+        sigma[i, i] = np.max(s[i] - gamma, 0)
+    return np.dot(np.dot(u, sigma), v)
+
+
+def prox_group_norm(b: np.ndarray,
+                    group: np.ndarray,
+                    threshold: float) -> np.ndarray:
+    result = np.zeros_like(b).astype(np.float64)
+    unique_group_ids = np.unique(group)
+    for group_id in unique_group_ids:
+        target_idx = group == group_id
+        target_coef = b[target_idx]
+        group_norm = np.linalg.norm(target_coef, 2)
+        multiplier = 0 if group_norm == 0 else max(0, 1 - threshold / group_norm)
+        result[target_idx] = multiplier * target_coef
+
+    return result
+
+
+def prox_trace_norm(x: np.ndarray,
+                    gamma: float):
+    """
+    Calculate Soft SVD
+
+    Args:
+        x: 2-d array
+        gamma: regularization parameter
+
+    Returns:
+
+    """
+    u, s, v = np.linalg.svd(x)
+    m, n = x.shape
+    sigma = np.zeros((m, n))
+    for i in range(len(s)):
+        sigma[i, i] = soft_threshold(s[i], gamma)
+    return np.dot(np.dot(u, sigma), v)
