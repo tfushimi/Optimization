@@ -3,7 +3,7 @@
 ## ADMM
 - Linear Lasso Regression
 - Fused Lasso
-- Sparse Low Rand Decomposition
+- Sparse Low Rank Decomposition
 
 ## Coordinate Descent
 - Linear Lasso Regression
