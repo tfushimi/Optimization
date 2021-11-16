@@ -45,7 +45,7 @@ def proximal_gradient_descent(x: np.ndarray,
     xTy = np.dot(x.T, y)
     xTx = np.dot(x.T, x)
 
-    t = 0.00001  # TODO use backtracking
+    t = 0.001  # TODO use backtracking
     for _ in range(MAX_COUNT):
         beta = beta + t * (xTy - np.dot(xTx, beta))
         beta = prox_group_norm(beta, group, t * gamma)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         beta_list[i, :] = result.beta
 
     plt.xlim(0, 10000)
-    plt.ylim(-3, 5)
+    plt.ylim(-10, 15)
     for j in range(p):
         plt.plot(gammas, beta_list[:, j], label=f"group={group[j]}")
     plt.hlines(y=0, xmin=0, xmax=10000, linestyles='dashed', colors='black')
