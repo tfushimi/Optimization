@@ -85,11 +85,11 @@ if __name__ == '__main__':
     gammas = np.arange(0, 10000, 100)
     beta_list = np.zeros((len(gammas), p))
     for i, gamma in enumerate(gammas):
-        result = admm(x, y, group, gamma, rho=10)
+        result = admm(x, y, group, gamma, rho=1)
         beta_list[i, :] = result.beta
 
     plt.xlim(0, 10000)
-    plt.ylim(-3, 5)
+    plt.ylim(-10, 15)
     for j in range(p):
         plt.plot(gammas, beta_list[:, j], label=f"group={group[j]}")
     plt.hlines(y=0, xmin=0, xmax=10000, linestyles='dashed', colors='black')
