@@ -4,6 +4,7 @@
 - Linear Lasso Regression
 - Fused Lasso
 - Sparse Low Rank Decomposition
+- Group Lasso
 
 ## Coordinate Descent
 - Linear Lasso Regression
